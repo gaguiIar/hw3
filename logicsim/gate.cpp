@@ -21,6 +21,34 @@ void Gate::wireInput(unsigned int id, Wire* in)
     }
 }
 
+Not2Gate::Not2Gate(Wire* in_wire, Wire* output)
+  : Gate(1, output)          
+{
+  wireInput(0, in_wire);       
+}
+
+Event* Not2Gate::update(uint64_t current_time)
+{
+  char in = m_inputs[0]->getState();
+  char state;
+  if (in == 'X')      
+  	state = 'X';
+  else if (in == '0') 
+  	state = '1';
+  else                
+  	state = '0';  
+
+  Event* nextEvent = nullptr;
+  if (state != m_current_state) {
+    m_current_state = state;
+
+    uint64_t scheduledTime = current_time + m_delay;  
+    nextEvent = new Event{ scheduledTime, m_output, state };
+}
+  return nextEvent;
+}
+
+
 And2Gate::And2Gate(Wire* a, Wire* b, Wire* o) : Gate(2,o)
 {
     wireInput(0,a);
@@ -88,3 +116,5 @@ Event* Or2Gate::update(uint64_t current_time)
 	}
   return e;
 }
+
+
